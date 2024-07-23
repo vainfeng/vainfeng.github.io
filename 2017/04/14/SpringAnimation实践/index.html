@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="SpringAnimation全解析介绍SpringAnimation类是一个动画库。 是由Android Support Library v25.3.0·引入的一个新模块。主要是为了更加方便的实现弹簧动画。其实早在官方支持之前，FaceBook就实现了类似的库Rebound，从效果来看也比较好。 我们先来介绍一下SpringAnimation的用法，然后再对照FaceBook的Rebound比较">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringAnimation实践">
+<meta property="og:url" content="http://example.com/2017/04/14/SpringAnimation%E5%AE%9E%E8%B7%B5/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="SpringAnimation全解析介绍SpringAnimation类是一个动画库。 是由Android Support Library v25.3.0·引入的一个新模块。主要是为了更加方便的实现弹簧动画。其实早在官方支持之前，FaceBook就实现了类似的库Rebound，从效果来看也比较好。 我们先来介绍一下SpringAnimation的用法，然后再对照FaceBook的Rebound比较">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/trans_spring.png">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/spring_animation_packet.png">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/springAnimation.gif">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/springAnimationConstruct.jpeg">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/viewProperty.jpeg">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/scrollAnimation.gif">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/springDemo.gif">
+<meta property="article:published_time" content="2017-04-14T07:14:04.000Z">
+<meta property="article:modified_time" content="2017-04-14T07:15:41.000Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ofqyh3mgg.bkt.clouddn.com/trans_spring.png">
+
+<link rel="canonical" href="http://example.com/2017/04/14/SpringAnimation%E5%AE%9E%E8%B7%B5/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>SpringAnimation实践 | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2017/04/14/SpringAnimation%E5%AE%9E%E8%B7%B5/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SpringAnimation实践
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2017-04-14 15:14:04 / Modified: 15:15:41" itemprop="dateCreated datePublished" datetime="2017-04-14T15:14:04+08:00">2017-04-14</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="SpringAnimation全解析"><a href="#SpringAnimation全解析" class="headerlink" title="SpringAnimation全解析"></a>SpringAnimation全解析</h2><h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p><code>SpringAnimation</code>类是一个动画库。</p>
+<p>是由<code>Android Support Library v25.3.0·</code>引入的一个新模块。主要是为了更加方便的实现弹簧动画。其实早在官方支持之前，FaceBook就实现了类似的库<a target="_blank" rel="noopener" href="http://facebook.github.io/rebound/">Rebound</a>，从效果来看也比较好。</p>
+<p>我们先来介绍一下<code>SpringAnimation</code>的用法，然后再对照FaceBook的<code>Rebound</code>比较一下区别。</p>
+<p>因为早期做过后端的开发，所以第一次听到Spring打头的时候就想到了大名鼎鼎的Spring框架，以及它的SpingMVC。后来一查，原来Spring除了春天，还有弹簧的意思。嗦嘚死内~<br><img src="http://ofqyh3mgg.bkt.clouddn.com/trans_spring.png"></p>
+<p>这个库非常，非常轻量。放张图片自己看</p>
+<p><img src="http://ofqyh3mgg.bkt.clouddn.com/spring_animation_packet.png"></p>
+<p>其中<code>SpringAnimation</code>是<code>DynamicAnimation</code>的子类</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DynamicAnimation--符合动力学的动画，即物理动画。也是物理动画类的基类</span><br></pre></td></tr></table></figure>
+<p>在实际使用中，我们接触到的类也就<code>SpringForce``SpringAnimation</code>和<code>DynamicAnimation.ViewPorperty</code>三个。</p>
+<p>其中<code>DynamicAnimaiton.ViewPorperty</code>是已经定义好的静态常量类。<br>它定义的内容就是3.0之后的属性动画中的属性<code>Porperty</code>。</p>
+<p>比如：Translation,Rotation,Scale….</p>
+<p>使用的话只需要通过类名直接访问即可。</p>
+<p>下面我们来看看例子</p>
+<h3 id="实践出真知"><a href="#实践出真知" class="headerlink" title="实践出真知"></a>实践出真知</h3><h4 id="第一步-：-导包"><a href="#第一步-：-导包" class="headerlink" title="第一步 ： 导包"></a>第一步 ： 导包</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">compile &#x27;com.android.support:support-dynamic-animation:25.3.0&#x27;</span><br></pre></td></tr></table></figure>
+
+<h4 id="第二步-：-sample"><a href="#第二步-：-sample" class="headerlink" title="第二步 ： sample"></a>第二步 ： sample</h4><p>场景：<br>一个Acitivity</p>
+<p>在这个Activity中声明一个ImageView</p>
+<p>给这个ImageView添加点击事件</p>
+<p>点击ImageView执行动画（往下平移100单位）</p>
+<p>代码很简单我就不贴了。主要贴一下点击事件的动画代码</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">mImg.setOnClickListener(new View.OnClickListener() &#123;</span><br><span class="line">           @Override</span><br><span class="line">           public void onClick(View view) &#123;</span><br><span class="line">               SpringForce springForce = new SpringForce(200);</span><br><span class="line">               //设置阻尼比例</span><br><span class="line">               springForce.setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY);</span><br><span class="line">               //设置生硬度</span><br><span class="line">               springForce.setStiffness(SpringForce.STIFFNESS_VERY_LOW);</span><br><span class="line"></span><br><span class="line">			//声明动画对象</span><br><span class="line">               SpringAnimation animation = new SpringAnimation(mImg,SpringAnimation.TRANSLATION_Y);</span><br><span class="line">               animation.setSpring(springForce);</span><br><span class="line">               //开始动画</span><br><span class="line">               animation.start();</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br></pre></td></tr></table></figure>
+
+<p><img src="http://ofqyh3mgg.bkt.clouddn.com/springAnimation.gif"></p>
+<p>动画的开始位置是ImageView所在的原本的位置</p>
+<p>动画的结束位置则是<code>SpringForce</code>构造函数中传入的finalPositon参数</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>以上总共使用了两个类：</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SpringAnimation</td>
+<td>弹簧动画类。可设置动画开始和结束、动画开始坐标、动画类型等</td>
+</tr>
+<tr>
+<td>SrpingForce</td>
+<td>弹性描述类。可设置弹力的阻尼，生硬度、动画终点坐标</td>
+</tr>
+</tbody></table>
+<h4 id="SpringAnimation"><a href="#SpringAnimation" class="headerlink" title="SpringAnimation"></a>SpringAnimation</h4><p><code>SpringAnimation</code>的构造函数有两个：</p>
+<p><img src="http://ofqyh3mgg.bkt.clouddn.com/springAnimationConstruct.jpeg"></p>
+<p>通过第二个构造函数传入第三个参数finalPositon(终点坐标)，<code>SpringAnimation</code>在内部也维护了一个<code>SpringForce</code>对象。所以上面的写法我们可以改成：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mImg.setOnClickListener(new View.OnClickListener() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void onClick(View view) &#123;</span><br><span class="line">                SpringAnimation animation = new SpringAnimation(mImg,SpringAnimation.TRANSLATION_Y,200);</span><br><span class="line">                animation.getSpring().setDampingRatio(SpringForce.DAMPING_RATIO_HIGH_BOUNCY);</span><br><span class="line">                animation.getSpring().setStiffness(SpringForce.STIFFNESS_VERY_LOW);</span><br><span class="line">                animation.start();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>效果是一样的，就不贴图了。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">值得注意的是,如果finalPosition如果传入的是0的话。动画是没有任何效果的。因为默认的动画起始坐标也是0，起点是0，终点是0，所以没有效果。</span><br><span class="line"></span><br><span class="line">除非使用SpringAnimation的setStartValue()方法设置动画的开始坐标为一个非0的值即可。总之开始坐标和传入的finalPosition的值不一致就可以了。</span><br></pre></td></tr></table></figure>
+
+
+<p>继续看<code>SpringAnimation</code>的构造函数。它的第二个参数<code>ViewProperty</code>其实就是<code>DynamicAnimation.ViewProperty</code>。直接通过子类的类名访问即可。<br><img src="http://ofqyh3mgg.bkt.clouddn.com/viewProperty.jpeg"></p>
+<p>这个类定义了<code>SpringAnimation</code>可以作用的属性，大多数都包含X,Y两个轴，也有包含Z轴的：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">ROTATION    // 旋转</span><br><span class="line">SCALE       // 缩放</span><br><span class="line">Translation // 平移</span><br><span class="line">Alpha       // 透明度</span><br></pre></td></tr></table></figure>
+
+<p>也有一个比较有意思的属性：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Scroll      // 滚动</span><br></pre></td></tr></table></figure>
+<p>这个动画让我们来看看效果：</p>
+<p><img src="http://ofqyh3mgg.bkt.clouddn.com/scrollAnimation.gif"></p>
+<p>这个动画是在View的宽高大小内进行内容的水平和垂直的移动。动画的执行是View的内容而不是View本身。当图片内容比实际图片的显示区域大的时候可能才有用武之地吧。</p>
+<h4 id="SpringForce"><a href="#SpringForce" class="headerlink" title="SpringForce"></a>SpringForce</h4><p><code>SpringForce</code>是用来调整动画执行过程的一些参数，使得动画的效果最适合。<br>其中最重要的两个:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// 设置阻尼比例</span><br><span class="line">public SpringForce setDampingRatio(@FloatRange(from = 0.0) float dampingRatio) &#123;</span><br><span class="line">		...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// 设置生硬度</span><br><span class="line">public SpringForce setStiffness(@FloatRange(from = 0.0) float stiffness) &#123;</span><br><span class="line">		...</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>阻尼的取值范围是在[0,1]之间。值越大，动画摆动的幅度越小，反之亦然。如果你传入最大值1。结果就是一个平移动画跟正常用属性动画实现的平移动画没有任何区别。</p>
+<p>生硬度的取值是一个比1大的正数即可。stiffness的值越小，弹簧更容易摆动，摆动的时间越长。反过来，stiffness的值越大，摆动的时间越短。这个值，决定了动画的摆动时间。</p>
+<p>具体，各位看官稍微试一下，立马就能理解了。</p>
+<p><code>SpringForce</code>默认帮我们定义了一些这个两个参数的取值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">   //高弹性</span><br><span class="line">   public static final float DAMPING_RATIO_HIGH_BOUNCY = 0.2f;</span><br><span class="line">   //中等弹性</span><br><span class="line">   public static final float DAMPING_RATIO_MEDIUM_BOUNCY = 0.5f;</span><br><span class="line">   //低弹性</span><br><span class="line">   public static final float DAMPING_RATIO_LOW_BOUNCY = 0.75f;</span><br><span class="line">   //没有弹性</span><br><span class="line">   public static final float DAMPING_RATIO_NO_BOUNCY = 1f;</span><br><span class="line"></span><br><span class="line">	//高生硬度</span><br><span class="line">   public static final float STIFFNESS_HIGH = 10_000f;</span><br><span class="line">//中生硬度   </span><br><span class="line">   public static final float STIFFNESS_MEDIUM = 1500f;</span><br><span class="line">   //低生硬度</span><br><span class="line">   public static final float STIFFNESS_LOW = 200f;</span><br><span class="line">   //很低生硬度</span><br><span class="line">   public static final float STIFFNESS_VERY_LOW = 50f;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+<h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a>实战</h3><p>我们用一个FaceBook的例子来实验一下。</p>
+<p>代码也很简单：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">springAnimationX = new SpringAnimation(mImg, SpringAnimation.SCALE_X, 0.5f);</span><br><span class="line">       springAnimationY = new SpringAnimation(mImg, SpringAnimation.SCALE_Y, 0.5f);</span><br><span class="line">       mImg.setOnTouchListener(new View.OnTouchListener() &#123;</span><br><span class="line">           @Override</span><br><span class="line">           public boolean onTouch(View v, MotionEvent event) &#123;</span><br><span class="line"></span><br><span class="line">               switch (event.getAction()) &#123;</span><br><span class="line">                   case MotionEvent.ACTION_DOWN:</span><br><span class="line">                       springAnimationY.getSpring().setDampingRatio(getDamping());</span><br><span class="line">                       springAnimationY.getSpring().setStiffness(getStiffness());</span><br><span class="line">                       springAnimationY.getSpring().setFinalPosition(0.5f);</span><br><span class="line"></span><br><span class="line">                       springAnimationX.getSpring().setDampingRatio(getDamping());</span><br><span class="line">                       springAnimationX.getSpring().setStiffness(getStiffness());</span><br><span class="line">                       springAnimationX.getSpring().setFinalPosition(0.5f);</span><br><span class="line"></span><br><span class="line">                       springAnimationY.start();</span><br><span class="line">                       springAnimationX.start();</span><br><span class="line"></span><br><span class="line">                       return true;</span><br><span class="line">                   case MotionEvent.ACTION_UP:</span><br><span class="line">                       springAnimationY.cancel();</span><br><span class="line">                       springAnimationX.cancel();</span><br><span class="line"></span><br><span class="line">                       springAnimationY.getSpring().setFinalPosition(1f);</span><br><span class="line">                       springAnimationX.getSpring().setFinalPosition(1f);</span><br><span class="line">                       springAnimationY.start();</span><br><span class="line">                       springAnimationX.start();</span><br><span class="line">                       return true;</span><br><span class="line">               &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">               return false;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>得到的效果是这样</p>
+<p><img src="http://ofqyh3mgg.bkt.clouddn.com/springDemo.gif"></p>
+<h3 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h3><p>从实现效果上来看跟FaceBook的Rebound库差别不是很明显（反正我是看不出来）。</p>
+<p>ReBound的优势在于在同一的动画中可以同时改变一个View的许多属性：</p>
+<p>比如在平移的同时旋转。它关注的是动画的动画的数值区间的值，改变View的属性这个由我们自己控制。</p>
+<p>而SpingAnimation如果要实现组合的动画效果，可能就要创建多个的SpringAnimation对象了。对于比较复杂的场景稍微麻烦一些。</p>
+<p>但是相对的，使用SpringAnimation来说，是直接作用到View上的。我们使用起来只需要确定最终的position和调整阻尼和生硬度两个参数而已。API简单，易上手。实现的效果也没的说。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/11/09/%E5%85%B3%E4%BA%8EGit%E5%8D%8F%E4%BD%9C%EF%BC%8C%E9%99%A4%E4%BA%86%E7%9F%A5%E9%81%93merge%EF%BC%8C%E4%BD%A0%E5%8F%AF%E8%83%BD%E8%BF%98%E9%9C%80%E8%A6%81%E7%9F%A5%E9%81%93rebase/" rel="prev" title="关于Git协作，除了知道merge，你可能还需要知道rebase">
+      <i class="fa fa-chevron-left"></i> 关于Git协作，除了知道merge，你可能还需要知道rebase
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/04/21/%E7%A7%91%E5%AD%A6%E7%9A%84%E6%96%87%E4%BB%B6%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84/" rel="next" title="科学的文件存储结构">
+      科学的文件存储结构 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#SpringAnimation%E5%85%A8%E8%A7%A3%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">SpringAnimation全解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-number">1.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E5%87%BA%E7%9C%9F%E7%9F%A5"><span class="nav-number">1.2.</span> <span class="nav-text">实践出真知</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%B8%80%E6%AD%A5-%EF%BC%9A-%E5%AF%BC%E5%8C%85"><span class="nav-number">1.2.1.</span> <span class="nav-text">第一步 ： 导包</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AC%AC%E4%BA%8C%E6%AD%A5-%EF%BC%9A-sample"><span class="nav-number">1.2.2.</span> <span class="nav-text">第二步 ： sample</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">1.3.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SpringAnimation"><span class="nav-number">1.3.1.</span> <span class="nav-text">SpringAnimation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SpringForce"><span class="nav-number">1.3.2.</span> <span class="nav-text">SpringForce</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E6%88%98"><span class="nav-number">1.4.</span> <span class="nav-text">实战</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">1.5.</span> <span class="nav-text">优缺点</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

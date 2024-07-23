@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本文将介绍RxJava的官网的文档记录在案的常用的操作符和用法，以及自己的一些思考。这篇文章的内容基于 12compile &#x27;io.reactivex:rxandroid:1.2.1&#x27;compile &#x27;io.reactivex:rxjava:1.1.6&#x27; 这两个版本。如果队长本文内容发现有API不一致的情况，请确定一下导入的库的版本是否一致。 这个系列不涉及">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxJava操作符---创建操作符（一）">
+<meta property="og:url" content="http://example.com/2016/10/28/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6---%E5%88%9B%E5%BB%BA%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="本文将介绍RxJava的官网的文档记录在案的常用的操作符和用法，以及自己的一些思考。这篇文章的内容基于 12compile &#x27;io.reactivex:rxandroid:1.2.1&#x27;compile &#x27;io.reactivex:rxjava:1.1.6&#x27; 这两个版本。如果队长本文内容发现有API不一致的情况，请确定一下导入的库的版本是否一致。 这个系列不涉及">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/from%E6%93%8D%E4%BD%9C%E7%AC%A6.png">
+<meta property="og:image" content="http://ofqyh3mgg.bkt.clouddn.com/interval%20%E9%87%8D%E8%BD%BD.png">
+<meta property="article:published_time" content="2016-10-28T06:33:16.000Z">
+<meta property="article:modified_time" content="2016-11-07T08:57:39.000Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://ofqyh3mgg.bkt.clouddn.com/from%E6%93%8D%E4%BD%9C%E7%AC%A6.png">
+
+<link rel="canonical" href="http://example.com/2016/10/28/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6---%E5%88%9B%E5%BB%BA%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%B8%80%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>RxJava操作符---创建操作符（一） | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2016/10/28/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6---%E5%88%9B%E5%BB%BA%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%B8%80%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RxJava操作符---创建操作符（一）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-10-28 14:33:16" itemprop="dateCreated datePublished" datetime="2016-10-28T14:33:16+08:00">2016-10-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2016-11-07 16:57:39" itemprop="dateModified" datetime="2016-11-07T16:57:39+08:00">2016-11-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文将介绍RxJava的官网的文档记录在案的常用的操作符和用法，以及自己的一些思考。这篇文章的内容基于</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">compile &#x27;io.reactivex:rxandroid:1.2.1&#x27;</span><br><span class="line">compile &#x27;io.reactivex:rxjava:1.1.6&#x27;</span><br></pre></td></tr></table></figure>
+<p>这两个版本。如果队长本文内容发现有API不一致的情况，请确定一下导入的库的版本是否一致。</p>
+<p>这个系列不涉及对Rx中一些概念的解释，比如什么是Observable、操作符是什么这类问题。关于Rx的介绍和入门，建议看官去看一下这篇文章——<a target="_blank" rel="noopener" href="http://gank.io/post/560e15be2dca930e00da1083">给Android开发者的RxJava详解</a>。</p>
+<p>OK，不多扯了，下面开始正式实践了….</p>
+<h4 id="create"><a href="#create" class="headerlink" title="create"></a>create</h4><p>create操作符是最基础的一个操作符之一，使用起来并不复杂。接收一个<code>OnSubscribe</code>类型的参数，其实是个接口，一般用匿名类的方式new出来即可。看代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Observable.create(new Observable.OnSubscribe&lt;String&gt;() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void call(Subscriber&lt;? super String&gt; subscriber) &#123;</span><br><span class="line">               if (!subscriber.isUnsubscribed()) &#123;//判断观察者是否取消订阅</span><br><span class="line">                    subscriber.onNext(&quot;test&quot;);</span><br><span class="line">                    subscriber.onCompleted();</span><br><span class="line">                &#125; else &#123;</span><br><span class="line">                    Log.d(TAG, &quot;unSubscribe&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">                .subscribe(new Action1&lt;String&gt;() &#123;</span><br><span class="line">                    @Override</span><br><span class="line">                    public void call(String s) &#123;</span><br><span class="line">                        Log.d(TAG, s);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br></pre></td></tr></table></figure>
+<p>唯一值得说一下的就是，在有些你需要关心观察者取消订阅的场景下时，你在<code>OnSubscribe</code>中判断一下观察者是否取消订阅，以免不必要的资源浪费。</p>
+<span id="more"></span>
+
+<h4 id="defer"><a href="#defer" class="headerlink" title="defer"></a>defer</h4><p>defer操作接收一个<code>Func0</code>接口实现类。需要返回一个<code>Observable</code>。直到有订阅者订阅的时候，才去执行<code>Func0</code>的工厂方法生成一个新的<code>Observable</code>。每次订阅都是一个新的数据。看代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">str = &quot;aaa&quot;;</span><br><span class="line">Observable  observable = Observable.defer(new Func0&lt;Observable&lt;String&gt;&gt;() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Observable&lt;String&gt; call() &#123;</span><br><span class="line">        //被订阅的时候才执行</span><br><span class="line">        return Observable.just(str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line">str = &quot;bbb&quot;;</span><br><span class="line">observable.subscribe(new Action1() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void call(Object o) &#123;</span><br><span class="line">    //输出 “bbb” 因为是在订阅的时候才执行</span><br><span class="line">    //这个时候str已经被赋值为 bbb</span><br><span class="line">        Log.d(TAG, &quot;defer : &quot; + str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="empty"><a href="#empty" class="headerlink" title="empty"></a>empty</h4><p>创建一个不发射数据但是正常终止的<code>Observable</code>。<br>当有订阅者订阅的时候，因为没有数据，只会回调<code>onComplete</code>函数。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Observable.empty()</span><br><span class="line">               .subscribe(new Subscriber&lt;Object&gt;() &#123;</span><br><span class="line">                   @Override</span><br><span class="line">                   public void onCompleted() &#123;</span><br><span class="line">                   //只会执行onCompleted方法</span><br><span class="line">                       Log.d(TAG, &quot;onCompleted&quot;);</span><br><span class="line">                   &#125;</span><br><span class="line"></span><br><span class="line">                   @Override</span><br><span class="line">                   public void onError(Throwable e) &#123;</span><br><span class="line">                       //不会执行</span><br><span class="line">                       Log.d(TAG, &quot;onError&quot;);</span><br><span class="line">                   &#125;</span><br><span class="line"></span><br><span class="line">                   @Override</span><br><span class="line">                   public void onNext(Object o) &#123;</span><br><span class="line">                       //不会执行</span><br><span class="line">                       Log.d(TAG, &quot;onNext&quot;);</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="nerver"><a href="#nerver" class="headerlink" title="nerver"></a>nerver</h4><p>创建一个不发射数据也不终止的<code>Observable</code>。<br>不会调用订阅者的任何方法。</p>
+<h4 id="error"><a href="#error" class="headerlink" title="error"></a>error</h4><p>创建一个不发射数据以一个错误终止的<code>Observable</code>。<br>该操作符需要传入一个<code>Throwable</code>对象。只会回调订阅者的<code>OnError</code>方法，并将传入的<code>Throwable</code>对象作为入参传入。</p>
+<h4 id="from"><a href="#from" class="headerlink" title="from"></a>from</h4><p>好的，终于讲到这个操作符了。<code>from</code>操作符在所有创建类操作符中，出场率算是比较高的了。我们先来看看这个操作符有多少重载：<br><img src="http://ofqyh3mgg.bkt.clouddn.com/from%E6%93%8D%E4%BD%9C%E7%AC%A6.png" alt="img"></p>
+<p>那么我们归纳下来主要有三种:java concurrent包下的<code>Future</code>对象。数组 <code>Array</code>对象。以及 <code>Iterator</code>也就是我们一般使用的集合对象。日常使用还是用数组和集合会多一些。<br><code>from</code>操作符可以转换数组和集合对象的中的每一个数据单独发送。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">String[] array = new String[]&#123;&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;&#125;;</span><br><span class="line">        Observable.from(array)</span><br><span class="line">                .subscribe(new Subscriber&lt;String&gt;() &#123;</span><br><span class="line">                    @Override</span><br><span class="line">                    public void onCompleted() &#123;</span><br><span class="line">                        Log.d(TAG, &quot;onCompleted&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public void onError(Throwable e) &#123;</span><br><span class="line"></span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public void onNext(String s) &#123;</span><br><span class="line">                        Log.d(TAG, &quot;onNext : &quot; + s);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br></pre></td></tr></table></figure>
+<p>上面这段结果的输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">onNext : a</span><br><span class="line">onNext : b</span><br><span class="line">onNext : c</span><br><span class="line">onNext : d</span><br><span class="line">onCompleted</span><br></pre></td></tr></table></figure>
+
+<h4 id="interval"><a href="#interval" class="headerlink" title="interval"></a>interval</h4><p>这个操作符是帮助你创建一个按照指定时间间隔发射一个递增的整数序列的<code>Observable</code>。<br><code>interval</code>默认在<code>computation</code>调度器上执行，你可以传入参数来指定调度器。<br>在一些比如倒计时的定时场景下还是很有用的。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">Observable.interval(1, TimeUnit.SECONDS)</span><br><span class="line">                .subscribe(new Subscriber&lt;Long&gt;() &#123;</span><br><span class="line">                    @Override</span><br><span class="line">                    public void onCompleted() &#123;</span><br><span class="line">                        Log.d(TAG, &quot;onCompleted&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public void onError(Throwable e) &#123;</span><br><span class="line">                        Log.d(TAG, &quot;onError&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public void onNext(Long aLong) &#123;</span><br><span class="line">                        Log.d(TAG, &quot;onNext : &quot; + aLong);</span><br><span class="line"></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br></pre></td></tr></table></figure>
+<p>上面这段代码的输出是 : </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">onNext : 0</span><br><span class="line">onNext : 1</span><br><span class="line">onNext : 2</span><br><span class="line">onNext : 3</span><br><span class="line">...//一直递增</span><br></pre></td></tr></table></figure>
+
+<p>那么怎么停下来呢？调用<code>subScribe</code>方法来订阅之后会返回一个<code>Subscription</code>对象，通过这个对象的<code>unsubscribe</code>方法来停止数据的发射。</p>
+<hr>
+<p>这里还有一种场景给各位看官提一下。</p>
+<p>在一个<code>Activity</code>中开始了一个<code>interval</code>的指定间隔的循环操作，这个时候如果你的<code>Activity</code>已经<code>onDestory</code>之后，这里会不会有内存泄露的问题呢？</p>
+<p>实践下来我得出的结论是会的。如果你没有在你的<code>onDestory</code>中去调用<code>unSubscribe</code>方法，则<code>interval</code>还是会继续执行。造成内存泄露。</p>
+<hr>
+<p><code>interval</code>操作符还提供一个重载的方法，可以延迟第一个数据的发射时间。<br><img src="http://ofqyh3mgg.bkt.clouddn.com/interval%20%E9%87%8D%E8%BD%BD.png" alt="interval重载"><br>就是在<code>initialDelay</code>时间后，开始发射第一个数据。之后每次按<code>period</code>时间间隔后，依次发射递增的数据序列。</p>
+<h4 id="just"><a href="#just" class="headerlink" title="just"></a>just</h4><p><code>just</code>操作符会创建一个发射指定数据的<code>Observable</code>。<br>类似于<code>from</code>操作符，但是<code>from</code>是将数据或者集合的元素逐一取出，逐一发射，而<code>just</code>只是原样发射，将数组当成单个数据去看待。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">String[] array = new String[]&#123;&quot;a&quot;, &quot;b&quot;, &quot;c&quot;, &quot;d&quot;&#125;;</span><br><span class="line">        Observable.just(array)</span><br><span class="line">                .subscribe(new Subscriber&lt;String[]&gt;() &#123;</span><br><span class="line">                    @Override</span><br><span class="line">                    public void onCompleted() &#123;</span><br><span class="line">                        Log.d(TAG, &quot;onCompleted&quot;);</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public void onError(Throwable e) &#123;</span><br><span class="line"></span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    @Override</span><br><span class="line">                    public void onNext(String[] strings) &#123;</span><br><span class="line">                        Log.d(TAG, &quot;onNext : &quot; + strings);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"> //这里打印的是数组的内存地址。</span><br><span class="line"> //这里会把数组看做一个单独的数据处理，这是跟from最大的区别</span><br><span class="line">onNext : [Ljava.lang.String;@3838ba49</span><br><span class="line">onCompleted</span><br></pre></td></tr></table></figure>
+
+<h4 id="range"><a href="#range" class="headerlink" title="range"></a>range</h4><p>这个操作符会创建一个发射范围内有序整数序列的一个<code>Observable</code>。<br>接受两个参数，一个是范围的起始值,一个是范围的数据的数目。如果你将第二个参数传入0，将导致<code>Observable</code>不发射任何数据，如果你传入负数，会抛出异常。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">Observable.range(1, 24)</span><br><span class="line">               .subscribe(new Subscriber&lt;Integer&gt;() &#123;</span><br><span class="line">                   @Override</span><br><span class="line">                   public void onCompleted() &#123;</span><br><span class="line">                       Log.d(TAG, &quot;onCompleted&quot;);</span><br><span class="line">                   &#125;</span><br><span class="line"></span><br><span class="line">                   @Override</span><br><span class="line">                   public void onError(Throwable e) &#123;</span><br><span class="line"></span><br><span class="line">                   &#125;</span><br><span class="line"></span><br><span class="line">                   @Override</span><br><span class="line">                   public void onNext(Integer integer) &#123;</span><br><span class="line">                       Log.d(TAG, &quot;onNext : &quot; + integer);</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>输出 ： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">onNext : 1</span><br><span class="line">onNext : 2</span><br><span class="line">... // 不断递增</span><br><span class="line">onNext : 24</span><br><span class="line">onCompleted</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>关于创建操作符除了上述这些还有<code>start``timer</code>等不太常用且使用简单的操作符（可能是我的使用场景比较有局限性），暂时没有介绍。有需要的同学可以去网上找找。^_^。</p>
+<p>最后，衷心的希望本篇文章会对你所有帮助。</p>
+<p>好了，我得去准备变换操作符的内容了….古德拜</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/10/27/%E5%B8%B8%E7%94%A8ADB%E5%91%BD%E4%BB%A4/" rel="prev" title="常用ADB命令">
+      <i class="fa fa-chevron-left"></i> 常用ADB命令
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/11/07/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6-%E5%8F%98%E6%8D%A2%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%BA%8C%EF%BC%89/" rel="next" title="RxJava操作符---变换操作符（二）">
+      RxJava操作符---变换操作符（二） <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#create"><span class="nav-number">1.</span> <span class="nav-text">create</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#defer"><span class="nav-number">2.</span> <span class="nav-text">defer</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#empty"><span class="nav-number">3.</span> <span class="nav-text">empty</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#nerver"><span class="nav-number">4.</span> <span class="nav-text">nerver</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#error"><span class="nav-number">5.</span> <span class="nav-text">error</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#from"><span class="nav-number">6.</span> <span class="nav-text">from</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#interval"><span class="nav-number">7.</span> <span class="nav-text">interval</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#just"><span class="nav-number">8.</span> <span class="nav-text">just</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#range"><span class="nav-number">9.</span> <span class="nav-text">range</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number"></span> <span class="nav-text">小结</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

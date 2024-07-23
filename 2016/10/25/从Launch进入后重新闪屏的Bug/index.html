@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="从Launch进入后重新闪屏的Bug刚开始碰到这个问题，感觉完全无从下手，Google都不知道该打什么样的关键字。最后描述现象后找到一篇帖子： 先到这个帖子中发现了类似的问题 从评论中说是APK从SDcard中安装会导致这个问题，顺着这条线索….. 然后在EOE论坛中找到了同样的帖子 最后在回复中找到了解决方法的链接 通过上面文章给的链接最终链到了StackOverFlow上的一篇帖子 好，按照资">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从Launch进入后重新闪屏的Bug">
+<meta property="og:url" content="http://example.com/2016/10/25/%E4%BB%8ELaunch%E8%BF%9B%E5%85%A5%E5%90%8E%E9%87%8D%E6%96%B0%E9%97%AA%E5%B1%8F%E7%9A%84Bug/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="从Launch进入后重新闪屏的Bug刚开始碰到这个问题，感觉完全无从下手，Google都不知道该打什么样的关键字。最后描述现象后找到一篇帖子： 先到这个帖子中发现了类似的问题 从评论中说是APK从SDcard中安装会导致这个问题，顺着这条线索….. 然后在EOE论坛中找到了同样的帖子 最后在回复中找到了解决方法的链接 通过上面文章给的链接最终链到了StackOverFlow上的一篇帖子 好，按照资">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-10-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2016-11-04T09:23:12.000Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2016/10/25/%E4%BB%8ELaunch%E8%BF%9B%E5%85%A5%E5%90%8E%E9%87%8D%E6%96%B0%E9%97%AA%E5%B1%8F%E7%9A%84Bug/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>从Launch进入后重新闪屏的Bug | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2016/10/25/%E4%BB%8ELaunch%E8%BF%9B%E5%85%A5%E5%90%8E%E9%87%8D%E6%96%B0%E9%97%AA%E5%B1%8F%E7%9A%84Bug/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          从Launch进入后重新闪屏的Bug
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-10-25 00:00:00" itemprop="dateCreated datePublished" datetime="2016-10-25T00:00:00+08:00">2016-10-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2016-11-04 17:23:12" itemprop="dateModified" datetime="2016-11-04T17:23:12+08:00">2016-11-04</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="从Launch进入后重新闪屏的Bug"><a href="#从Launch进入后重新闪屏的Bug" class="headerlink" title="从Launch进入后重新闪屏的Bug"></a>从Launch进入后重新闪屏的Bug</h3><p>刚开始碰到这个问题，感觉完全无从下手，Google都不知道该打什么样的关键字。最后描述现象后找到一篇帖子：</p>
+<p><a target="_blank" rel="noopener" href="http://www.apkbus.com/thread-128180-1-1.html">先到这个帖子中发现了类似的问题</a></p>
+<p>从评论中说是APK从SDcard中安装会导致这个问题，顺着这条线索…..</p>
+<p><a target="_blank" rel="noopener" href="http://www.eoeandroid.com/thread-65992-1-1.html">然后在EOE论坛中找到了同样的帖子</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.2cto.com/kf/201407/319948.html">最后在回复中找到了解决方法的链接</a></p>
+<p><a target="_blank" rel="noopener" href="http://stackoverflow.com/questions/6337217/how-to-return-to-the-latest-launched-activity-when-re-launching-application-afte">通过上面文章给的链接最终链到了StackOverFlow上的一篇帖子</a></p>
+<p>好，按照资料上说的，我在APP启动的第一个入口Activity的onCreate()方法中加入如下代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if((getIntent.getFlag() &amp; Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT)!=0)&#123;</span><br><span class="line">   finish();</span><br><span class="line">   return;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>然后继续测试，最后发现从<strong>launcher</strong>进入的时候是会回到原来的<strong>Activity</strong>，但是会出现白屏很长一段时间然后再跳转到我原本按<code>Home</code>键退出的<strong>Activity</strong>，非常影响用户体验。于是我的心里已经开始骂娘了……..不过没有关系，程序猿时刻都要准备Plan B。</p>
+<hr>
+<h3 id="Plan-B"><a href="#Plan-B" class="headerlink" title="Plan B"></a>Plan B</h3><p><em><strong>思路：</strong></em></p>
+<p>问题是由于APP从SDCard中点击安装后，在安装成功的弹框中直接选择<code>打开</code>才会出现这个问题，从最近任务中杀掉进程再次进入则没有问题。</p>
+<blockquote>
+<p>1.在入口<code>Activity</code>通过Intent的Falg来区分从<code>Launcher</code>启动还是从<code>SDCard</code>直接安装打开的</p>
+<p>2.经测试从<code>SDCard</code>直接安装打开的<code>Intent</code>的Flag为，<code>Intent.FLAG_RECEIVER_FOREGROUND</code>这个常量，所有我们只要判断这个常量即可</p>
+<p>3.在非常规情况下（也就是我们这次碰到的这个问题下），在APP中用一个全局唯一的变量保存一下状态，那么进入APP后，无论是用户按<code>Back</code>或者按<code>Home</code>后将我们的APP的进程杀掉就好了。我的处理方法就是在用户退到<code>Activity</code>栈的根<code>Activity</code>的时候直接调用<code>Finish</code>（正常情况这个Activity是不会<code>Finish</code>的）。这样用户下次进来后直接就相当于正常从<code>Launcher</code>重新启动了。</p>
+</blockquote>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2016/10/25/APK%20%E5%8F%8D%E7%BC%96%E8%AF%91%20in%20MAC%20OS/" rel="next" title="APK 反编译 in MAC OS">
+      APK 反编译 in MAC OS <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%8ELaunch%E8%BF%9B%E5%85%A5%E5%90%8E%E9%87%8D%E6%96%B0%E9%97%AA%E5%B1%8F%E7%9A%84Bug"><span class="nav-number">1.</span> <span class="nav-text">从Launch进入后重新闪屏的Bug</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Plan-B"><span class="nav-number">2.</span> <span class="nav-text">Plan B</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

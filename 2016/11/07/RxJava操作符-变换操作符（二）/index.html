@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="buffer看名字也知道这个操作符跟缓存有关。恩，这个操作符就是会吧Observable的数据几个几个的打包，之后再发射。这个几个就是在使用这个操作符的时候我们调用者传入的参数。这么说可能还是有点抽象，我们来写个demo： 123Observable.just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)                .buffer(3)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxJava操作符---变换操作符（二）">
+<meta property="og:url" content="http://example.com/2016/11/07/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6-%E5%8F%98%E6%8D%A2%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+<meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="buffer看名字也知道这个操作符跟缓存有关。恩，这个操作符就是会吧Observable的数据几个几个的打包，之后再发射。这个几个就是在使用这个操作符的时候我们调用者传入的参数。这么说可能还是有点抽象，我们来写个demo： 123Observable.just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)                .buffer(3)">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2016-11-07T08:58:43.000Z">
+<meta property="article:modified_time" content="2016-12-05T08:14:19.000Z">
+<meta property="article:author" content="John Doe">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2016/11/07/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6-%E5%8F%98%E6%8D%A2%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%BA%8C%EF%BC%89/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>RxJava操作符---变换操作符（二） | Hexo</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Hexo</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2016/11/07/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6-%E5%8F%98%E6%8D%A2%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%BA%8C%EF%BC%89/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="John Doe">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hexo">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RxJava操作符---变换操作符（二）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2016-11-07 16:58:43" itemprop="dateCreated datePublished" datetime="2016-11-07T16:58:43+08:00">2016-11-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2016-12-05 16:14:19" itemprop="dateModified" datetime="2016-12-05T16:14:19+08:00">2016-12-05</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%8A%80%E6%9C%AF/" itemprop="url" rel="index"><span itemprop="name">技术</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="buffer"><a href="#buffer" class="headerlink" title="buffer"></a>buffer</h3><p>看名字也知道这个操作符跟缓存有关。恩，这个操作符就是会吧<code>Observable</code>的数据几个几个的打包，之后再发射。这个几个就是在使用这个操作符的时候我们调用者传入的参数。<br>这么说可能还是有点抽象，我们来写个demo：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Observable.just(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)</span><br><span class="line">                .buffer(3)</span><br><span class="line">                .subscribe(i -&gt; Log.d(TAG, &quot;buffer :&quot; + i));</span><br></pre></td></tr></table></figure>
+<p>上面这段代码的输出是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">buffer : [1, 2, 3]</span><br><span class="line">buffer : [4 ,5, 6]</span><br><span class="line">buffer : [7, 8, 9]</span><br><span class="line">buffer : [10]</span><br></pre></td></tr></table></figure>
+
+<p>是不是一下就明白了？ </p>
+<p><code>buffer</code>操作符还有一个重载，不光传入一个缓存个数，还传入一个skip的参数。这个skip就是每隔几个数据打包数据的意思。如果我们将上面的<code>buffer</code>使用</p>
+<pre><code>buffer(3,2).subscribe(&#123;....&#125;)
+</code></pre>
+<p>我们来看看结果：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">buffer : [1, 2, 3]</span><br><span class="line">buffer : [3, 4, 5]</span><br><span class="line">buffer : [5, 6, 7]</span><br><span class="line">buffer : [7, 8, 9]</span><br><span class="line">buffer : [9,10]</span><br></pre></td></tr></table></figure>
+<p>每隔2个数据，打包三个数据。就是这么个意思啦。</p>
+<h3 id="flatMap"><a href="#flatMap" class="headerlink" title="flatMap"></a>flatMap</h3><p><code>FlatMap</code>将一个发射数据的<code>Observable</code>变换为多个<code>Observable</code>，然后将它们发射的数据合并后放进一个单独的<code>Observable</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Integer[] arrays = new Integer[]&#123;1, 2, 3, 4, 5, 6, 7, 8, 9, 10&#125;;</span><br><span class="line">        Observable.from(arrays)</span><br><span class="line">                .flatMap(new Func1&lt;Integer, Observable&lt;?&gt;&gt;() &#123;</span><br><span class="line">                    @Override</span><br><span class="line">                    public Observable&lt;?&gt; call(Integer integer) &#123;</span><br><span class="line">                        return Observable.just(&quot;flatMap  &quot; + integer).subscribeOn(Schedulers.newThread());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;).subscribe(i -&gt; Log.d(TAG, i.toString()))</span><br></pre></td></tr></table></figure>
+
+<p>这里的输出是 ： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">flatMap  1</span><br><span class="line">... // 这里不一定是按顺序的哦,可能会乱序</span><br><span class="line">flatMap  10</span><br></pre></td></tr></table></figure>
+<p>各位同学可以看到，在这个操作符的返回中，返回的是一个新的<code>Observable</code>。符合它的定义啊，将一个发射数据的<code>Observable</code>变换为多个<code>Observable</code>，这里我们数据的长度是10，就会生成10个新的<code>Observable</code>。</p>
+<p>又会有同学问了，为什么我在操作符中去生成一个新的<code>Observable</code>的时候后面要加上：</p>
+<pre><code>.subscribeOn(Schedulers.newThread());
+</code></pre>
+<p>这也是我准备跟大家说的一个很重要的注意事项。通常我们在使用的<code>flatMap</code>的时候，肯定是会将原始的数据加工成另外我们所需的数据再往下传递下去（比如传入的是一个id，要去查询数据库这个id对应的数据等等…）。这个工作肯定我们是要放到一个新的线程去做才合理的。</p>
+<p>那么同时，<code>flatMap</code>的特点就是不保证每一个新生成的<code>Observable</code>产生的顺序，由于源码中对发射过来的数据是做的<code>merge</code>操作，所以不保证顺序。</p>
+<h4 id="concatMap"><a href="#concatMap" class="headerlink" title="concatMap"></a>concatMap</h4><p>这个操作符类似最简单版本的<code>flatMap</code>，但是唯一的不同就是这个操作符发射的数据是依次发射的。所以这也是它存在的原因。例子同上，我这里就不重复写了。</p>
+<h3 id="map"><a href="#map" class="headerlink" title="map"></a>map</h3><p>这个操作符使用到的地方还是蛮多的。<br>这个操作符对原始<code>Observable</code>发射的每一项数据应用一个你选择的函数，然后返回一个发射这些结果的<code>Observable</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Observable.just(1, 2, 3)</span><br><span class="line">               .map(new Func1&lt;Integer, String&gt;() &#123;</span><br><span class="line">                   @Override</span><br><span class="line">                   public String call(Integer integer) &#123;</span><br><span class="line">                       return integer + &quot;a&quot;;</span><br><span class="line">                   &#125;</span><br><span class="line">               &#125;).subscribe(new Subscriber&lt;String&gt;() &#123;</span><br><span class="line">           @Override</span><br><span class="line">           public void onCompleted() &#123;</span><br><span class="line">               Log.d(TAG, &quot;onCompleted&quot;);</span><br><span class="line">           &#125;</span><br><span class="line">           @Override</span><br><span class="line">           public void onError(Throwable e) &#123;</span><br><span class="line"></span><br><span class="line">           &#125;</span><br><span class="line">           @Override</span><br><span class="line">           public void onNext(String o) &#123;</span><br><span class="line">               Log.d(TAG, o);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>输出 ： </p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1a</span><br><span class="line">2a</span><br><span class="line">3a</span><br><span class="line">onCompleted</span><br></pre></td></tr></table></figure>
+
+<p><code>map</code>操作符接受一个Fun1的参数，两个泛型，一个是参数的类型，一个是函数的返回值的类型。一般参数的类型，初始于我们的发射的数据源，这个不太好变，我们在用这个操作符的时候，更多需要关注第二个泛型，你想要返回的类型。</p>
+<p>这个操作符默认不在任何特定的调度器上执行。如果需要，可以通过<code>observeOn</code>函数指定函数的工作线程。</p>
+<h4 id="cast"><a href="#cast" class="headerlink" title="cast"></a>cast</h4><p>讲到<code>map</code>这个操作符，顺带提一下<code>cast</code>这个特殊的<code>map</code>操作符。</p>
+<p><code>cast</code>操作符，是将原始的发射的每一项数据都强制转换为一个指定的类型，然后继续发射。</p>
+<p>恩，使用的场景不是很多。所以，大概知道一下。</p>
+<h3 id="groupBy"><a href="#groupBy" class="headerlink" title="groupBy"></a>groupBy</h3><p>这个操作符将一个<code>Observable</code>分拆为一些<code>Observables</code>集合，它们中的每一个发射原始<code>Observable</code>的一个子序列。</p>
+<p>To be continue….</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/10/28/RxJava%E6%93%8D%E4%BD%9C%E7%AC%A6---%E5%88%9B%E5%BB%BA%E6%93%8D%E4%BD%9C%E7%AC%A6%EF%BC%88%E4%B8%80%EF%BC%89/" rel="prev" title="RxJava操作符---创建操作符（一）">
+      <i class="fa fa-chevron-left"></i> RxJava操作符---创建操作符（一）
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/11/09/%E5%85%B3%E4%BA%8EGit%E5%8D%8F%E4%BD%9C%EF%BC%8C%E9%99%A4%E4%BA%86%E7%9F%A5%E9%81%93merge%EF%BC%8C%E4%BD%A0%E5%8F%AF%E8%83%BD%E8%BF%98%E9%9C%80%E8%A6%81%E7%9F%A5%E9%81%93rebase/" rel="next" title="关于Git协作，除了知道merge，你可能还需要知道rebase">
+      关于Git协作，除了知道merge，你可能还需要知道rebase <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#buffer"><span class="nav-number">1.</span> <span class="nav-text">buffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#flatMap"><span class="nav-number">2.</span> <span class="nav-text">flatMap</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#concatMap"><span class="nav-number">2.1.</span> <span class="nav-text">concatMap</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#map"><span class="nav-number">3.</span> <span class="nav-text">map</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#cast"><span class="nav-number">3.1.</span> <span class="nav-text">cast</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#groupBy"><span class="nav-number">4.</span> <span class="nav-text">groupBy</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">John Doe</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">categories</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">John Doe</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
