@@ -32,8 +32,13 @@
 <meta property="og:image" content="https://vainfeng.github.io/images/logo-dependi.png">
 <meta property="og:image" content="https://vainfeng.github.io/images/logo-error-lens.png">
 <meta property="og:image" content="https://vainfeng.github.io/images/logo-CodeLLDB.png">
+<meta property="og:image" content="https://vainfeng.github.io/images/cargo-construct.png">
+<meta property="og:image" content="https://vainfeng.github.io/images/cargo_run_shot.png">
+<meta property="og:image" content="https://vainfeng.github.io/images/cargo_build_shot.png">
+<meta property="og:image" content="https://vainfeng.github.io/images/manual_run_shot.png">
+<meta property="og:image" content="https://vainfeng.github.io/images/cargo_check_shot.png">
 <meta property="article:published_time" content="2034-07-27T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-07-28T05:05:48.744Z">
+<meta property="article:modified_time" content="2024-07-28T07:50:58.007Z">
 <meta property="article:author" content="Lucas">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://vainfeng.github.io/images/rust-analyzer.png">
@@ -187,7 +192,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-07-28 13:05:48" itemprop="dateModified" datetime="2024-07-28T13:05:48+08:00">2024-07-28</time>
+                <time title="Modified: 2024-07-28 15:50:58" itemprop="dateModified" datetime="2024-07-28T15:50:58+08:00">2024-07-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -253,7 +258,43 @@
 <blockquote>
 <p>一个Debugger程序</p>
 </blockquote>
-<h3 id="Hello-world"><a href="#Hello-world" class="headerlink" title="Hello,world"></a>Hello,world</h3>
+<h3 id="Hello-world"><a href="#Hello-world" class="headerlink" title="Hello,world"></a>Hello,world</h3><h5 id="Cargo"><a href="#Cargo" class="headerlink" title="Cargo"></a>Cargo</h5><p>Cargo之与Rust相当于npm之与nodejs。是一个好的包管理工具。我们可以用它来管理工程的全生命周期。从创建到build项目，测试到运行再到部署。</p>
+<h5 id="创建“hello-world”"><a href="#创建“hello-world”" class="headerlink" title="创建“hello world”"></a>创建“hello world”</h5><p>在你的workspace下使用这两行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cargo new test_demo</span><br><span class="line">cd test_demo</span><br></pre></td></tr></table></figure>
+
+<p>这样你就进入到了你的新建的工程目录下。该工程的项目结构和配置文件都是由cargo生成，意味着我们的项目被cargo所管理。</p>
+<p>目录结构如下：</p>
+<p><img src="/images/cargo-construct.png" alt="image-20240728151630034"></p>
+<p><code>main</code>文件夹下存在.rs结尾的rust源文件；</p>
+<p><code>target</code>下存放build之后的可执行文件；</p>
+<p><code>Cargo.toml</code>则是项目的配置文件，里面描述了我们项目的名称，版本号，依赖包管理等等….非常像Android中的Gradle。；</p>
+<p><code>Cargo_lock</code>文件是cargo工具根据同一项目的<code>toml</code>文件生成的<strong>项目依赖详细清单</strong>，我们一般不用去编辑它，只需要关注<code>Cargo.toml</code>文件内容即可。</p>
+<p>其中<code>main</code>文件夹下默认帮我们创建好了一个main.rs的文件。里面生成了默认的hello world代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fn main() &#123;</span><br><span class="line">    println!(&quot;Hello, world!&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h6><p>有两种方式可以运行我们的项目：</p>
+<ul>
+<li>cargo run &#x2F;&#x2F; 编译 + 执行</li>
+</ul>
+<p>​	<img src="/images/cargo_run_shot.png" alt="image-20240728152554455"></p>
+<ul>
+<li>手动编译+ 手动执行</li>
+</ul>
+<p>​	– 编译：</p>
+<p><img src="/images/cargo_build_shot.png" alt="image-20240728152900369"></p>
+<p>​	– 运行：编译后，会在<code>target</code>文件夹生成可执行文件，所以我们执行它</p>
+<p><img src="/images/manual_run_shot.png" alt="image-20240728153033202"></p>
+<p>默认情况下无论是<code>cargo run</code>还是<code>cargo build</code>都是处于<strong>debug模式下，代码的编译速度会非常快</strong>，但是<strong>运行速度就慢了</strong>。目的为了在开发阶段，尽可能让编译快速完成，让开发流程更顺畅。</p>
+<p>那么如果要正式发布的时候。我们会添加<code>--release</code>参数来编译：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cargo run --release</span><br><span class="line">cargo build --release // 这之后会在target文件夹下生成一个release子文件夹，我们运行这个文件夹下的执行文件</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="cargo-check"><a href="#cargo-check" class="headerlink" title="cargo check"></a>cargo check</h6><p>当项目变大之后，无论是<code>cargo run</code>还是<code>cargo build</code>都会不可避免的变慢，<code>cargo check</code>这个命令则是一种更快的验证我们代码的编译正确性。它的作用很简单：<strong>快速的检查代码是否能被编译通过</strong>。这个命令速度非常快，因此能节省大量的编译时间：</p>
+<p><img src="/images/cargo_check_shot.png" alt="image-20240728154516448"></p>
+
     </div>
 
     
@@ -330,7 +371,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Journey-of-Rust-%E4%B8%80-%EF%BC%9A%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%8C%E5%88%9D%E8%AF%86Cargo"><span class="nav-number">1.</span> <span class="nav-text">Journey of Rust(一)：环境搭建，初识Cargo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text">环境安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%B8%B8%E8%A7%84%E5%91%BD%E4%BB%A4%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">其他常规命令操作：</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0"><span class="nav-number">1.1.0.1.1.</span> <span class="nav-text">更新</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BD-%E8%BF%99%E4%BC%9A%E5%8D%B8%E8%BD%BDrustup-%E5%92%8C-rust"><span class="nav-number">1.1.0.1.2.</span> <span class="nav-text">卸载 - 这会卸载rustup 和 rust</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F"><span class="nav-number">1.1.0.1.3.</span> <span class="nav-text">检查是否安装成功</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.0.1.4.</span> <span class="nav-text">离线文档</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IDE%E9%80%89%E6%8B%A9"><span class="nav-number">1.2.</span> <span class="nav-text">IDE选择</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8F%90%E5%8D%87%E5%B9%B8%E7%A6%8F%E6%84%9F%E7%9A%84%E7%9B%B8%E5%85%B3%E6%8F%92%E4%BB%B6"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">提升幸福感的相关插件</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#rust-analyzer"><span class="nav-number">1.2.0.1.1.</span> <span class="nav-text">rust-analyzer</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#even-better-toml"><span class="nav-number">1.2.0.1.2.</span> <span class="nav-text">even-better-toml</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Dependi"><span class="nav-number">1.2.0.1.3.</span> <span class="nav-text">Dependi</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Error-Lens"><span class="nav-number">1.2.0.1.4.</span> <span class="nav-text">Error Lens</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#One-Dark-Pro"><span class="nav-number">1.2.0.1.5.</span> <span class="nav-text">One Dark Pro</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CodeLLDB"><span class="nav-number">1.2.0.1.6.</span> <span class="nav-text">CodeLLDB</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hello-world"><span class="nav-number">1.3.</span> <span class="nav-text">Hello,world</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Journey-of-Rust-%E4%B8%80-%EF%BC%9A%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%8C%E5%88%9D%E8%AF%86Cargo"><span class="nav-number">1.</span> <span class="nav-text">Journey of Rust(一)：环境搭建，初识Cargo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85"><span class="nav-number">1.1.</span> <span class="nav-text">环境安装</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E5%B8%B8%E8%A7%84%E5%91%BD%E4%BB%A4%E6%93%8D%E4%BD%9C%EF%BC%9A"><span class="nav-number">1.1.0.1.</span> <span class="nav-text">其他常规命令操作：</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0"><span class="nav-number">1.1.0.1.1.</span> <span class="nav-text">更新</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BD-%E8%BF%99%E4%BC%9A%E5%8D%B8%E8%BD%BDrustup-%E5%92%8C-rust"><span class="nav-number">1.1.0.1.2.</span> <span class="nav-text">卸载 - 这会卸载rustup 和 rust</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E6%88%90%E5%8A%9F"><span class="nav-number">1.1.0.1.3.</span> <span class="nav-text">检查是否安装成功</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E7%A6%BB%E7%BA%BF%E6%96%87%E6%A1%A3"><span class="nav-number">1.1.0.1.4.</span> <span class="nav-text">离线文档</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IDE%E9%80%89%E6%8B%A9"><span class="nav-number">1.2.</span> <span class="nav-text">IDE选择</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%8F%90%E5%8D%87%E5%B9%B8%E7%A6%8F%E6%84%9F%E7%9A%84%E7%9B%B8%E5%85%B3%E6%8F%92%E4%BB%B6"><span class="nav-number">1.2.0.1.</span> <span class="nav-text">提升幸福感的相关插件</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#rust-analyzer"><span class="nav-number">1.2.0.1.1.</span> <span class="nav-text">rust-analyzer</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#even-better-toml"><span class="nav-number">1.2.0.1.2.</span> <span class="nav-text">even-better-toml</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Dependi"><span class="nav-number">1.2.0.1.3.</span> <span class="nav-text">Dependi</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#Error-Lens"><span class="nav-number">1.2.0.1.4.</span> <span class="nav-text">Error Lens</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#One-Dark-Pro"><span class="nav-number">1.2.0.1.5.</span> <span class="nav-text">One Dark Pro</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#CodeLLDB"><span class="nav-number">1.2.0.1.6.</span> <span class="nav-text">CodeLLDB</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hello-world"><span class="nav-number">1.3.</span> <span class="nav-text">Hello,world</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Cargo"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">Cargo</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E2%80%9Chello-world%E2%80%9D"><span class="nav-number">1.3.0.2.</span> <span class="nav-text">创建“hello world”</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C"><span class="nav-number">1.3.0.2.1.</span> <span class="nav-text">运行</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#cargo-check"><span class="nav-number">1.3.0.2.2.</span> <span class="nav-text">cargo check</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

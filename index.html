@@ -179,7 +179,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2024-07-28 13:05:48" itemprop="dateModified" datetime="2024-07-28T13:05:48+08:00">2024-07-28</time>
+                <time title="Modified: 2024-07-28 15:50:58" itemprop="dateModified" datetime="2024-07-28T15:50:58+08:00">2024-07-28</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -245,7 +245,43 @@
 <blockquote>
 <p>一个Debugger程序</p>
 </blockquote>
-<h3 id="Hello-world"><a href="#Hello-world" class="headerlink" title="Hello,world"></a>Hello,world</h3>
+<h3 id="Hello-world"><a href="#Hello-world" class="headerlink" title="Hello,world"></a>Hello,world</h3><h5 id="Cargo"><a href="#Cargo" class="headerlink" title="Cargo"></a>Cargo</h5><p>Cargo之与Rust相当于npm之与nodejs。是一个好的包管理工具。我们可以用它来管理工程的全生命周期。从创建到build项目，测试到运行再到部署。</p>
+<h5 id="创建“hello-world”"><a href="#创建“hello-world”" class="headerlink" title="创建“hello world”"></a>创建“hello world”</h5><p>在你的workspace下使用这两行命令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cargo new test_demo</span><br><span class="line">cd test_demo</span><br></pre></td></tr></table></figure>
+
+<p>这样你就进入到了你的新建的工程目录下。该工程的项目结构和配置文件都是由cargo生成，意味着我们的项目被cargo所管理。</p>
+<p>目录结构如下：</p>
+<p><img src="/images/cargo-construct.png" alt="image-20240728151630034"></p>
+<p><code>main</code>文件夹下存在.rs结尾的rust源文件；</p>
+<p><code>target</code>下存放build之后的可执行文件；</p>
+<p><code>Cargo.toml</code>则是项目的配置文件，里面描述了我们项目的名称，版本号，依赖包管理等等….非常像Android中的Gradle。；</p>
+<p><code>Cargo_lock</code>文件是cargo工具根据同一项目的<code>toml</code>文件生成的<strong>项目依赖详细清单</strong>，我们一般不用去编辑它，只需要关注<code>Cargo.toml</code>文件内容即可。</p>
+<p>其中<code>main</code>文件夹下默认帮我们创建好了一个main.rs的文件。里面生成了默认的hello world代码：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">fn main() &#123;</span><br><span class="line">    println!(&quot;Hello, world!&quot;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h6><p>有两种方式可以运行我们的项目：</p>
+<ul>
+<li>cargo run &#x2F;&#x2F; 编译 + 执行</li>
+</ul>
+<p>​	<img src="/images/cargo_run_shot.png" alt="image-20240728152554455"></p>
+<ul>
+<li>手动编译+ 手动执行</li>
+</ul>
+<p>​	– 编译：</p>
+<p><img src="/images/cargo_build_shot.png" alt="image-20240728152900369"></p>
+<p>​	– 运行：编译后，会在<code>target</code>文件夹生成可执行文件，所以我们执行它</p>
+<p><img src="/images/manual_run_shot.png" alt="image-20240728153033202"></p>
+<p>默认情况下无论是<code>cargo run</code>还是<code>cargo build</code>都是处于<strong>debug模式下，代码的编译速度会非常快</strong>，但是<strong>运行速度就慢了</strong>。目的为了在开发阶段，尽可能让编译快速完成，让开发流程更顺畅。</p>
+<p>那么如果要正式发布的时候。我们会添加<code>--release</code>参数来编译：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cargo run --release</span><br><span class="line">cargo build --release // 这之后会在target文件夹下生成一个release子文件夹，我们运行这个文件夹下的执行文件</span><br></pre></td></tr></table></figure>
+
+
+
+<h6 id="cargo-check"><a href="#cargo-check" class="headerlink" title="cargo check"></a>cargo check</h6><p>当项目变大之后，无论是<code>cargo run</code>还是<code>cargo build</code>都会不可避免的变慢，<code>cargo check</code>这个命令则是一种更快的验证我们代码的编译正确性。它的作用很简单：<strong>快速的检查代码是否能被编译通过</strong>。这个命令速度非常快，因此能节省大量的编译时间：</p>
+<p><img src="/images/cargo_check_shot.png" alt="image-20240728154516448"></p>
+
       
     </div>
 
