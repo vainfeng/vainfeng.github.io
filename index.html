@@ -148,6 +148,143 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://vainfeng.github.io/2034/08/03/Journey%20of%20Rust(%E4%BA%8C)%EF%BC%9A%E5%8F%98%E9%87%8F%E5%92%8C%E5%8F%AF%E5%8F%98%E7%B1%BB%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Lucas">
+      <meta itemprop="description" content="一个搞事的程序猿">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="疯子的小站">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2034/08/03/Journey%20of%20Rust(%E4%BA%8C)%EF%BC%9A%E5%8F%98%E9%87%8F%E5%92%8C%E5%8F%AF%E5%8F%98%E7%B1%BB%E5%9E%8B/" class="post-title-link" itemprop="url">Journey of Rust(二)：变量和可变类型</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2034-08-03 00:00:00" itemprop="dateCreated datePublished" datetime="2034-08-03T00:00:00+08:00">2034-08-03</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-08-03 15:05:34" itemprop="dateModified" datetime="2024-08-03T15:05:34+08:00">2024-08-03</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Rust/" itemprop="url" rel="index"><span itemprop="name">Rust</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="Journey-of-Rust-二-：变量和可变类型"><a href="#Journey-of-Rust-二-：变量和可变类型" class="headerlink" title="Journey of Rust(二)：变量和可变类型"></a>Journey of Rust(二)：变量和可变类型</h2><h3 id="可变变量和不可变变量（Mutable-Immutable）"><a href="#可变变量和不可变变量（Mutable-Immutable）" class="headerlink" title="可变变量和不可变变量（Mutable&amp;Immutable）"></a>可变变量和不可变变量（Mutable&amp;Immutable）</h3><blockquote>
+<p>Rust的变量默认是不可改变的（immutable），如果我们想改变变量的值，就需要声明可变变量（mutable）</p>
+</blockquote>
+<h4 id="如何声明变量？"><a href="#如何声明变量？" class="headerlink" title="如何声明变量？"></a>如何声明变量？</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 声明不可变变量</span><br><span class="line">let x = 5;</span><br><span class="line">println!(&quot;the value of x is &#123;&#125;&quot;, x);</span><br><span class="line"></span><br><span class="line">// 声明可变变量</span><br><span class="line">let mut x = 5;</span><br><span class="line">println!(&quot;before change the value of x is &#123;&#125;&quot;, x);</span><br><span class="line">x = 6;</span><br><span class="line">println!(&quot;after change the value of x is &#123;&#125;&quot;, x);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="常量（Constants）"><a href="#常量（Constants）" class="headerlink" title="常量（Constants）"></a>常量（Constants）</h3><blockquote>
+<p>使用const关键字来定义一个常量。定义常量时需要明确的指定常量的数据类型。</p>
+</blockquote>
+<p><strong>注意事项</strong>：</p>
+<ul>
+<li>必须显示指定数据类型</li>
+<li>常量名一般使用大写字母，否则编译器会报Warning</li>
+<li>必须使用常量表达式进行赋值，即必须是编译期能计算出的值。</li>
+<li>常量不支持重定义（遮蔽），这和变量是不同的。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 常量声明</span><br><span class="line">const NUM: i32 = 5;</span><br><span class="line">println!(&quot;constants values is &#123;&#125;&quot;, NUM);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="不可变变量和常量的区别？"><a href="#不可变变量和常量的区别？" class="headerlink" title="不可变变量和常量的区别？"></a>不可变变量和常量的区别？</h4><ul>
+<li>关键字：常量使用<code>const</code>声明，不可变变量使用<code>let</code></li>
+<li>赋值时机：常量在编译期就确定了值，无法再运行时改变。不可变变量直到运行期才能确定下来</li>
+<li>能否改变：常量不可以修改，不可变变量可以通过<code>shadowing</code>来修改</li>
+<li>声明：常量必须声明类型，不可变变量不需要</li>
+<li>命名：常量必须使用大写字母，不可变变量不需要</li>
+</ul>
+<h3 id="静态变量（Static）"><a href="#静态变量（Static）" class="headerlink" title="静态变量（Static）"></a>静态变量（Static）</h3><blockquote>
+<p>使用static关键字声明，并在编译时分配内存，且在程序运行期间一直存在；</p>
+<p>静态变量可以在整个程序中共享，且可以再多个线程间共享；</p>
+<p>静态变量的值在运行期间不会改变，因此它们通常用于存储程序的全局状态。</p>
+</blockquote>
+<h4 id="静态变量和常量的区别"><a href="#静态变量和常量的区别" class="headerlink" title="静态变量和常量的区别"></a>静态变量和常量的区别</h4><ul>
+<li>关键字：一个使用<code>static</code>, 一个使用<code>const</code></li>
+<li>常量在编译时被内联，但静态变量不会。在整个程序中静态变量只有一个实例，所有引用都指向一个地址</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 常量的内联</span><br><span class="line">const A: i32 = 1;</span><br><span class="line">static B: i32 = 2;</span><br><span class="line">fn main () &#123;</span><br><span class="line">	println!&#123;&quot;const value = &#123;&#125;&quot;, A&#125;;</span><br><span class="line">	//在编译期间，常量的访问会被替换成常量的值（内联）</span><br><span class="line">	//所以上面的代码会被编译成：println!&#123;&quot;const value = &#123;&#125;&quot;, 1&#125;;</span><br><span class="line">  </span><br><span class="line">  // 但是静态变量的访问指向的是这个变量所对应的内存地址</span><br><span class="line">  println!&#123;&quot;static value = &#123;&#125;&quot;, B&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<ul>
+<li>可变性：常量不可变，静态变量默认不可变，但可以通过<code>mut</code>关键字定义为可变</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 声明一个可变的静态变量</span><br><span class="line">static mut NUM: i32 = 30;</span><br><span class="line"></span><br><span class="line">// 静态变量是全局的，多线程共享的。对它的值的修改不是线程安全的，需要把这段代码放入unsafe代码块中执行。否则编译期间会报错。这里只是举例</span><br><span class="line">unsafe &#123;</span><br><span class="line">	NUM += 1;</span><br><span class="line">	println!(&quot;the static value is &#123;&#125;&quot;, NUM);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="变量遮蔽（variable-shadowing）"><a href="#变量遮蔽（variable-shadowing）" class="headerlink" title="变量遮蔽（variable shadowing）"></a>变量遮蔽（variable shadowing）</h3><blockquote>
+<p>通过对不可变变量的重新声明的方式，可以完成对不可变变量值的遮蔽</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 声明一个不可变变量</span><br><span class="line">let short_live_binding: i32 = 2;</span><br><span class="line">println!(&quot;before shadowing -- short variable : &#123;&#125;&quot;, short_live_binding);</span><br><span class="line"></span><br><span class="line">// 遮蔽, 对同一个不可变变量的变量名重新声明赋值</span><br><span class="line">let short_live_binding: i32 = 5;</span><br><span class="line">println!(&quot;after shadowing -- short variable : &#123;&#125;&quot;, short_live_binding);</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">before shadowing -- short variable : 2</span><br><span class="line">after shadowing -- short variable : 5</span><br></pre></td></tr></table></figure>
+
+
+
+<p>遮蔽一个比当前作用域声明周期更长的变量的时候，遮蔽的作用范围只在当前的作用域内，超出作用域的变量的值还是遮蔽之前的值：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">let global_value: i32 = 1;</span><br><span class="line">// 声明一个代码块</span><br><span class="line">&#123;</span><br><span class="line">	let global_value: i32 = 2;</span><br><span class="line">	// 完成遮蔽</span><br><span class="line">	println!(&quot;in block value is &#123;&#125;&quot;,global_value);</span><br><span class="line">&#125;</span><br><span class="line">// 在遮蔽的作用域外</span><br><span class="line">println!(&quot;global value is &#123;&#125;&quot;, global_value)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p><strong>输出：</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">in block value is 2</span><br><span class="line">global value is 1</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
     <link itemprop="mainEntityOfPage" href="https://vainfeng.github.io/2034/07/28/Journey%20of%20Rust(%E4%B8%80)%EF%BC%9A%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%EF%BC%8C%E5%88%9D%E8%AF%86Cargo/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -281,128 +418,6 @@
 
 <h6 id="cargo-check"><a href="#cargo-check" class="headerlink" title="cargo check"></a>cargo check</h6><p>当项目变大之后，无论是<code>cargo run</code>还是<code>cargo build</code>都会不可避免的变慢，<code>cargo check</code>这个命令则是一种更快的验证我们代码的编译正确性。它的作用很简单：<strong>快速的检查代码是否能被编译通过</strong>。这个命令速度非常快，因此能节省大量的编译时间：</p>
 <p><img src="/images/cargo_check_shot.png" alt="image-20240728154516448"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://vainfeng.github.io/2024/08/03/Journey%20of%20Rust(%E4%BA%8C)%EF%BC%9A%E5%8F%98%E9%87%8F%E5%92%8C%E5%8F%AF%E5%8F%98%E7%B1%BB%E5%9E%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Lucas">
-      <meta itemprop="description" content="一个搞事的程序猿">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="疯子的小站">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/08/03/Journey%20of%20Rust(%E4%BA%8C)%EF%BC%9A%E5%8F%98%E9%87%8F%E5%92%8C%E5%8F%AF%E5%8F%98%E7%B1%BB%E5%9E%8B/" class="post-title-link" itemprop="url">Untitled</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2024-08-03 14:36:14 / Modified: 15:04:08" itemprop="dateCreated datePublished" datetime="2024-08-03T14:36:14+08:00">2024-08-03</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="Journey-of-Rust-二-：变量和可变类型"><a href="#Journey-of-Rust-二-：变量和可变类型" class="headerlink" title="Journey of Rust(二)：变量和可变类型"></a>Journey of Rust(二)：变量和可变类型</h2><h3 id="可变变量和不可变变量（Mutable-Immutable）"><a href="#可变变量和不可变变量（Mutable-Immutable）" class="headerlink" title="可变变量和不可变变量（Mutable&amp;Immutable）"></a>可变变量和不可变变量（Mutable&amp;Immutable）</h3><blockquote>
-<p>Rust的变量默认是不可改变的（immutable），如果我们想改变变量的值，就需要声明可变变量（mutable）</p>
-</blockquote>
-<h4 id="如何声明变量？"><a href="#如何声明变量？" class="headerlink" title="如何声明变量？"></a>如何声明变量？</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 声明不可变变量</span><br><span class="line">let x = 5;</span><br><span class="line">println!(&quot;the value of x is &#123;&#125;&quot;, x);</span><br><span class="line"></span><br><span class="line">// 声明可变变量</span><br><span class="line">let mut x = 5;</span><br><span class="line">println!(&quot;before change the value of x is &#123;&#125;&quot;, x);</span><br><span class="line">x = 6;</span><br><span class="line">println!(&quot;after change the value of x is &#123;&#125;&quot;, x);</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="常量（Constants）"><a href="#常量（Constants）" class="headerlink" title="常量（Constants）"></a>常量（Constants）</h3><blockquote>
-<p>使用const关键字来定义一个常量。定义常量时需要明确的指定常量的数据类型。</p>
-</blockquote>
-<p><strong>注意事项</strong>：</p>
-<ul>
-<li>必须显示指定数据类型</li>
-<li>常量名一般使用大写字母，否则编译器会报Warning</li>
-<li>必须使用常量表达式进行赋值，即必须是编译期能计算出的值。</li>
-<li>常量不支持重定义（遮蔽），这和变量是不同的。</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 常量声明</span><br><span class="line">const NUM: i32 = 5;</span><br><span class="line">println!(&quot;constants values is &#123;&#125;&quot;, NUM);</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="不可变变量和常量的区别？"><a href="#不可变变量和常量的区别？" class="headerlink" title="不可变变量和常量的区别？"></a>不可变变量和常量的区别？</h4><ul>
-<li>关键字：常量使用<code>const</code>声明，不可变变量使用<code>let</code></li>
-<li>赋值时机：常量在编译期就确定了值，无法再运行时改变。不可变变量直到运行期才能确定下来</li>
-<li>能否改变：常量不可以修改，不可变变量可以通过<code>shadowing</code>来修改</li>
-<li>声明：常量必须声明类型，不可变变量不需要</li>
-<li>命名：常量必须使用大写字母，不可变变量不需要</li>
-</ul>
-<h3 id="静态变量（Static）"><a href="#静态变量（Static）" class="headerlink" title="静态变量（Static）"></a>静态变量（Static）</h3><blockquote>
-<p>使用static关键字声明，并在编译时分配内存，且在程序运行期间一直存在；</p>
-<p>静态变量可以在整个程序中共享，且可以再多个线程间共享；</p>
-<p>静态变量的值在运行期间不会改变，因此它们通常用于存储程序的全局状态。</p>
-</blockquote>
-<h4 id="静态变量和常量的区别"><a href="#静态变量和常量的区别" class="headerlink" title="静态变量和常量的区别"></a>静态变量和常量的区别</h4><ul>
-<li>关键字：一个使用<code>static</code>, 一个使用<code>const</code></li>
-<li>常量在编译时被内联，但静态变量不会。在整个程序中静态变量只有一个实例，所有引用都指向一个地址</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 常量的内联</span><br><span class="line">const A: i32 = 1;</span><br><span class="line">static B: i32 = 2;</span><br><span class="line">fn main () &#123;</span><br><span class="line">	println!&#123;&quot;const value = &#123;&#125;&quot;, A&#125;;</span><br><span class="line">	//在编译期间，常量的访问会被替换成常量的值（内联）</span><br><span class="line">	//所以上面的代码会被编译成：println!&#123;&quot;const value = &#123;&#125;&quot;, 1&#125;;</span><br><span class="line">  </span><br><span class="line">  // 但是静态变量的访问指向的是这个变量所对应的内存地址</span><br><span class="line">  println!&#123;&quot;static value = &#123;&#125;&quot;, B&#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<ul>
-<li>可变性：常量不可变，静态变量默认不可变，但可以通过<code>mut</code>关键字定义为可变</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 声明一个可变的静态变量</span><br><span class="line">static mut NUM: i32 = 30;</span><br><span class="line"></span><br><span class="line">// 静态变量是全局的，多线程共享的。对它的值的修改不是线程安全的，需要把这段代码放入unsafe代码块中执行。否则编译期间会报错。这里只是举例</span><br><span class="line">unsafe &#123;</span><br><span class="line">	NUM += 1;</span><br><span class="line">	println!(&quot;the static value is &#123;&#125;&quot;, NUM);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="变量遮蔽（variable-shadowing）"><a href="#变量遮蔽（variable-shadowing）" class="headerlink" title="变量遮蔽（variable shadowing）"></a>变量遮蔽（variable shadowing）</h3><blockquote>
-<p>通过对不可变变量的重新声明的方式，可以完成对不可变变量值的遮蔽</p>
-</blockquote>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// 声明一个不可变变量</span><br><span class="line">let short_live_binding: i32 = 2;</span><br><span class="line">println!(&quot;before shadowing -- short variable : &#123;&#125;&quot;, short_live_binding);</span><br><span class="line"></span><br><span class="line">// 遮蔽, 对同一个不可变变量的变量名重新声明赋值</span><br><span class="line">let short_live_binding: i32 = 5;</span><br><span class="line">println!(&quot;after shadowing -- short variable : &#123;&#125;&quot;, short_live_binding);</span><br></pre></td></tr></table></figure>
-
-<p><strong>输出：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">before shadowing -- short variable : 2</span><br><span class="line">after shadowing -- short variable : 5</span><br></pre></td></tr></table></figure>
-
-
-
-<p>遮蔽一个比当前作用域声明周期更长的变量的时候，遮蔽的作用范围只在当前的作用域内，超出作用域的变量的值还是遮蔽之前的值：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">let global_value: i32 = 1;</span><br><span class="line">// 声明一个代码块</span><br><span class="line">&#123;</span><br><span class="line">	let global_value: i32 = 2;</span><br><span class="line">	// 完成遮蔽</span><br><span class="line">	println!(&quot;in block value is &#123;&#125;&quot;,global_value);</span><br><span class="line">&#125;</span><br><span class="line">// 在遮蔽的作用域外</span><br><span class="line">println!(&quot;global value is &#123;&#125;&quot;, global_value)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p><strong>输出：</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">in block value is 2</span><br><span class="line">global value is 1</span><br></pre></td></tr></table></figure>
-
 
       
     </div>
